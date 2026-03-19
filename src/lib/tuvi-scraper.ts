@@ -185,6 +185,30 @@ const CUNG_ORDER = [
   'tai-bach', 'tu-tuc', 'phu-the', 'huynh-de',
 ];
 
+function buildApiHeaders() {
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.URL ||
+    "";
+  return {
+    "Content-Type": "application/json",
+    Accept: "application/json,text/plain,*/*",
+    "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+    "User-Agent": "Mozilla/5.0 (compatible; TuviProject/1.0)",
+    ...(siteUrl ? { Origin: siteUrl, Referer: siteUrl } : {}),
+    "X-Requested-With": "XMLHttpRequest",
+  } as const;
+}
+
+async function readResponseTextSafe(res: Response) {
+  try {
+    const txt = await res.text();
+    return txt.slice(0, 800);
+  } catch {
+    return "";
+  }
+}
+
 export async function fetchTuViData(params: {
   name: string;
   day: number;
@@ -199,7 +223,7 @@ export async function fetchTuViData(params: {
   // Step 1: POST to create the la-so and get the slug
   const createRes = await fetch(`${API_BASE}/la-so`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildApiHeaders(),
     body: JSON.stringify({
       name: params.name,
       day: params.day,
@@ -211,10 +235,16 @@ export async function fetchTuViData(params: {
       nam_xem: params.viewYear,
       thang_xem: params.viewMonth,
     }),
+    cache: "no-store",
   });
 
   if (!createRes.ok) {
-    throw new Error(`API create failed: ${createRes.status}`);
+    const bodySnippet = await readResponseTextSafe(createRes);
+    throw new Error(
+      `API create failed: ${createRes.status}${
+        createRes.statusText ? ` ${createRes.statusText}` : ""
+      }${bodySnippet ? ` - ${bodySnippet}` : ""}`,
+    );
   }
 
   const createJson = (await createRes.json()) as ApiResponse;
@@ -228,12 +258,18 @@ export async function fetchTuViData(params: {
   const dataRes = await fetch(
     `${API_BASE}/la-so/${slug}?thang-xem=${params.viewMonth}&nam-xem=${params.viewYear}`,
     {
-      headers: { 'Content-Type': 'application/json' },
+      headers: buildApiHeaders(),
+      cache: "no-store",
     }
   );
 
   if (!dataRes.ok) {
-    throw new Error(`API fetch failed: ${dataRes.status}`);
+    const bodySnippet = await readResponseTextSafe(dataRes);
+    throw new Error(
+      `API fetch failed: ${dataRes.status}${
+        dataRes.statusText ? ` ${dataRes.statusText}` : ""
+      }${bodySnippet ? ` - ${bodySnippet}` : ""}`,
+    );
   }
 
   const dataJson = (await dataRes.json()) as ApiResponse;
