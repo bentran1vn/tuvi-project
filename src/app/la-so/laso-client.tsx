@@ -1,164 +1,16 @@
-import type { Metadata as Metadata2 } from "next";
-import { LasoClient as LasoClient2, type LasoClientInput as LasoClientInput2 } from "./laso-client";
+ 'use client';
 
-const metadata2: Metadata2 = {
-  title: "Kết Quả Lá Số Tử Vi",
-  description: "Xem kết quả lá số tử vi của bạn.",
-};
-
-type SearchParams2 = Promise<{
-  name?: string;
-  day?: string;
-  month?: string;
-  year?: string;
-  solar?: string;
-  hour?: string;
-  gender?: string;
-  viewYear?: string;
-  viewMonth?: string;
-}>;
-
-export default async function LasoPage({
-  searchParams,
-}: {
-  searchParams: SearchParams2;
-}) {
-  const params = await searchParams;
-
-  const adsenseClientSlotLasoBottom =
-    process.env.NEXT_PUBLIC_ADSENSE_SLOT_LASO_BOTTOM || "";
-
-  const input: LasoClientInput2 = {
-    name: params.name || "",
-    day: parseInt(params.day || "1", 10),
-    month: parseInt(params.month || "1", 10),
-    year: parseInt(params.year || "2000", 10),
-    solar: params.solar !== "0",
-    hour: parseInt(params.hour || "1", 10),
-    gender: params.gender || "M",
-    viewYear: parseInt(
-      params.viewYear || new Date().getFullYear().toString(),
-      10,
-    ),
-    viewMonth: parseInt(params.viewMonth || "1", 10),
-  };
-
-  return (
-    <LasoClient2
-      input={input}
-      adsenseClientSlotLasoBottom={adsenseClientSlotLasoBottom}
-    />
-  );
-}
-
- import type { Metadata } from "next";
- import { LasoClient, type LasoClientInput } from "./laso-client";
-import Link from "next/link";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   fetchTuViData,
   type CungData,
   type TuViData,
-} from "@/lib/tuvi-scraper";
-import { CopyToClipboardButton } from "@/components/copy-to-clipboard-button";
-import { AdsenseAd } from "@/components/adsense-ad";
-import { ShopeeAd } from "@/components/shopee-ad";
+} from '@/lib/tuvi-scraper';
+import { CopyToClipboardButton } from '@/components/copy-to-clipboard-button';
+import { AdsenseAd } from '@/components/adsense-ad';
+import { ShopeeAd } from '@/components/shopee-ad';
 
- export const metadata: Metadata = {
-   title: "Kết Quả Lá Số Tử Vi",
-   description: "Xem kết quả lá số tử vi của bạn.",
- };
-
- type SearchParams = Promise<{
-   name?: string;
-   day?: string;
-   month?: string;
-   year?: string;
-   solar?: string;
-   hour?: string;
-   gender?: string;
-   viewYear?: string;
-   viewMonth?: string;
- }>;
-
-async function LasoPageOld2({
-   searchParams,
- }: {
-   searchParams: SearchParams;
- }) {
-   const params = await searchParams;
-
-   const adsenseClientSlotLasoBottom =
-     process.env.NEXT_PUBLIC_ADSENSE_SLOT_LASO_BOTTOM || "";
-
-   const input: LasoClientInput = {
-     name: params.name || "",
-     day: parseInt(params.day || "1", 10),
-     month: parseInt(params.month || "1", 10),
-     year: parseInt(params.year || "2000", 10),
-     solar: params.solar !== "0",
-     hour: parseInt(params.hour || "1", 10),
-     gender: params.gender || "M",
-     viewYear: parseInt(
-       params.viewYear || new Date().getFullYear().toString(),
-       10,
-     ),
-     viewMonth: parseInt(params.viewMonth || "1", 10),
-   };
-
-   return (
-     <LasoClient
-       input={input}
-       adsenseClientSlotLasoBottom={adsenseClientSlotLasoBottom}
-     />
-   );
- }
-
-/* import type { Metadata } from "next";
-import {
-  fetchTuViData,
-  type CungData,
-  type TuViData,
-} from "@/lib/tuvi-scraper";
-import Link from "next/link";
-import { CopyToClipboardButton } from "@/components/copy-to-clipboard-button";
-import { AdsenseAd } from "@/components/adsense-ad";
-import { ShopeeAd } from "@/components/shopee-ad";
-import { LasoClient } from "./laso-client";
-
-export const metadata: Metadata = {
-  title: "Kết Quả Lá Số Tử Vi",
-  description: "Xem kết quả lá số tử vi của bạn.",
-};
-
-type SearchParams = Promise<{
-  name?: string;
-  day?: string;
-  month?: string;
-  year?: string;
-  solar?: string;
-  hour?: string;
-  gender?: string;
-  viewYear?: string;
-  viewMonth?: string;
-}>;
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  if (!value) return null;
-  return (
-    <div>
-      <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-        {label}
-      </dt>
-      <dd className="mt-0.5 text-sm text-zinc-900 dark:text-zinc-100">
-        {value}
-      </dd>
-    </div>
-  );
-}*/
-
-// Fallback for the (now unused) legacy server-rendered code.
-// This keeps TypeScript type-checking happy while the actual route rendering
-// is done by `LasoClient` (client-side fetch).
 function InfoRow({ label, value }: { label: string; value: string }) {
   if (!value) return null;
   return (
@@ -175,15 +27,15 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 
 function CungCard({ cung }: { cung: CungData }) {
   const chinhTinhDisplay = cung.chinhTinh.map((ct) => {
-    const ds = ct.doSang ? ` (${ct.doSang})` : "";
+    const ds = ct.doSang ? ` (${ct.doSang})` : '';
     return `${ct.amDuong} ${ct.name}${ds}`;
   });
 
   const formatPhuTinh = (s: (typeof cung.phuTinh)[number]) =>
     s.doSang ? `${s.name} (${s.doSang})` : s.name;
 
-  const saoTot = cung.phuTinh.filter((s) => s.status === "C");
-  const saoXau = cung.phuTinh.filter((s) => s.status === "H");
+  const saoTot = cung.phuTinh.filter((s) => s.status === 'C');
+  const saoXau = cung.phuTinh.filter((s) => s.status === 'H');
 
   const saoTotDisplay = saoTot.map(formatPhuTinh);
   const saoXauDisplay = saoXau.map(formatPhuTinh);
@@ -225,16 +77,16 @@ function CungCard({ cung }: { cung: CungData }) {
       {chinhTinhDisplay.length > 0 ? (
         <div className="mb-3">
           <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-            Chính tinh:{" "}
+            Chính tinh:{' '}
           </span>
           <span className="text-sm text-zinc-900 dark:text-zinc-100">
-            {chinhTinhDisplay.join(" , ")}
+            {chinhTinhDisplay.join(' , ')}
           </span>
         </div>
       ) : (
         <div className="mb-3">
           <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-            Chính tinh:{" "}
+            Chính tinh:{' '}
           </span>
           <span className="text-sm italic text-zinc-500 dark:text-zinc-400">
             (Vô chính diệu)
@@ -252,22 +104,22 @@ function CungCard({ cung }: { cung: CungData }) {
         <div className="mb-3">
           <div className="mb-1">
             <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-              Sao tốt:{" "}
+              Sao tốt:{' '}
             </span>
             <span className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
               {saoTotDisplay.length > 0
-                ? saoTotDisplay.join(" , ")
-                : "(không có)"}
+                ? saoTotDisplay.join(' , ')
+                : '(không có)'}
             </span>
           </div>
           <div>
             <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-              Sao xấu:{" "}
+              Sao xấu:{' '}
             </span>
             <span className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
               {saoXauDisplay.length > 0
-                ? saoXauDisplay.join(" , ")
-                : "(không có)"}
+                ? saoXauDisplay.join(' , ')
+                : '(không có)'}
             </span>
           </div>
         </div>
@@ -275,7 +127,7 @@ function CungCard({ cung }: { cung: CungData }) {
 
       {vanHanParts.length > 0 && (
         <div className="border-t border-zinc-100 pt-2 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
-          <strong>Vận hạn:</strong> {vanHanParts.join(" ")}
+          <strong>Vận hạn:</strong> {vanHanParts.join(' ')}
         </div>
       )}
 
@@ -286,18 +138,24 @@ function CungCard({ cung }: { cung: CungData }) {
   );
 }
 
-function buildCopyText(thienBan: TuViData["thienBan"], cungs: CungData[]) {
+function buildCopyText(thienBan: TuViData['thienBan'], cungs: CungData[]) {
   const lines: string[] = [];
 
-  lines.push("Thông Tin Tổng Quan");
-  lines.push("");
-  lines.push(`Họ tên: ${thienBan.hoTen || ""}`);
+  lines.push('Thông Tin Tổng Quan');
+  lines.push('');
+  lines.push(`Họ tên: ${thienBan.hoTen || ''}`);
   lines.push(
-    `Năm sinh: ${thienBan.namSinh || ""}${thienBan.canChiFull ? ` (${thienBan.canChiFull.split(",")[0]?.trim() || thienBan.canChiFull})` : ""}`,
+    `Năm sinh: ${thienBan.namSinh || ''}${
+      thienBan.canChiFull
+        ? ` (${thienBan.canChiFull.split(',')[0]?.trim() || thienBan.canChiFull})`
+        : ''
+    }`,
   );
   if (thienBan.solarDate || thienBan.lunarDate) {
     lines.push(
-      `Ngày sinh: ${thienBan.solarDate || ""} (Dương lịch) — ${thienBan.lunarDate || ""} (Âm lịch)`,
+      `Ngày sinh: ${thienBan.solarDate || ''} (Dương lịch) — ${
+        thienBan.lunarDate || ''
+      } (Âm lịch)`,
     );
   }
   if (thienBan.gioSinh) {
@@ -305,53 +163,55 @@ function buildCopyText(thienBan: TuViData["thienBan"], cungs: CungData[]) {
   }
   if (thienBan.banMenh) {
     lines.push(
-      `Bản mệnh: ${thienBan.banMenh}${thienBan.cucFull ? ` - ${thienBan.cucFull}` : ""}`,
+      `Bản mệnh: ${thienBan.banMenh}${
+        thienBan.cucFull ? ` - ${thienBan.cucFull}` : ''
+      }`,
     );
   }
   if (thienBan.namXem) {
     lines.push(`Năm xem: ${thienBan.namXem}`);
   }
-  lines.push("");
+  lines.push('');
 
-  lines.push("Sắp Xếp 12 Cung Số");
-  lines.push("");
+  lines.push('Sắp Xếp 12 Cung Số');
+  lines.push('');
 
   cungs.forEach((cung, idx) => {
-    const thanPart = cung.isThan ? " <THÂN>" : "";
+    const thanPart = cung.isThan ? ' <THÂN>' : '';
     lines.push(
       `${idx + 1}. Cung ${cung.cungName}${thanPart} (tại ${cung.viTri})`,
     );
-    lines.push("");
+    lines.push('');
 
     if (cung.chinhTinh.length > 0) {
       const main = cung.chinhTinh
         .map((ct) => {
-          const doSang = ct.doSang ? ` (${ct.doSang})` : "";
+          const doSang = ct.doSang ? ` (${ct.doSang})` : '';
           return `${ct.amDuong} ${ct.name}${doSang}`.trim();
         })
-        .join(" , ");
+        .join(' , ');
       lines.push(`Chính tinh: ${main}`);
     } else {
-      lines.push(`Chính tinh: (Vô chính diệu)`);
+      lines.push('Chính tinh: (Vô chính diệu)');
     }
 
     lines.push(`Tuổi/Tháng: ${cung.daiVan} | ${cung.khoiNguyetHan}`);
 
-    const saoTot = cung.phuTinh.filter((s) => s.status === "C");
-    const saoXau = cung.phuTinh.filter((s) => s.status === "H");
+    const saoTot = cung.phuTinh.filter((s) => s.status === 'C');
+    const saoXau = cung.phuTinh.filter((s) => s.status === 'H');
 
     if (saoTot.length > 0) {
       lines.push(
         `Sao tốt: ${saoTot
           .map((s) => (s.doSang ? `${s.name} (${s.doSang})` : s.name))
-          .join(" , ")}.`,
+          .join(' , ')}.`,
       );
     }
     if (saoXau.length > 0) {
       lines.push(
         `Sao xấu: ${saoXau
           .map((s) => (s.doSang ? `${s.name} (${s.doSang})` : s.name))
-          .join(" , ")}.`,
+          .join(' , ')}.`,
       );
     }
 
@@ -359,14 +219,14 @@ function buildCopyText(thienBan: TuViData["thienBan"], cungs: CungData[]) {
       const parts = [cung.daiVanText, cung.trangSinh, cung.luuNien].filter(
         Boolean,
       );
-      if (parts.length) lines.push(`Vận hạn: ${parts.join(" ")}`);
+      if (parts.length) lines.push(`Vận hạn: ${parts.join(' ')}`);
     }
 
     lines.push(`Vị trí: ${cung.viTri}`);
-    lines.push("");
+    lines.push('');
   });
 
-  return lines.join("\n").trim();
+  return lines.join('\n').trim();
 }
 
 const SYSTEM_PROMPT = `Bạn là “AI Luận Lá Số Tử Vi Chuyên Sâu” chuyên phân tích lá số Tử Vi dựa trên dữ liệu do người dùng cung cấp (đã copy từ bảng tử vi). Mục tiêu: tạo bản luận giải dài, sâu, có cấu trúc rõ ràng để người đọc có thể “đỡ phải đọc nhiều thứ” mà vẫn hiểu được cuộc đời theo các trục: năng lực – mâu thuẫn – lựa chọn – cơ hội – rủi ro – giai đoạn.
@@ -390,7 +250,7 @@ A) Nhận diện các khối dữ liệu:
 - “Sắp Xếp 12 Cung Số”
   - 12 cung: mỗi cung theo mẫu “{STT}. Cung {TÊN} (THÂN nếu có) (tại {VỊ_TRÍ})”
   - Mỗi cung có: “Chính tinh”, “Sao tốt”, “Sao xấu”, “Vận hạn …” (nếu có), “Vị trí …”
-
+:
 B) Với mỗi cung, trích xuất:
 - chính tinh: danh sách sao chính tinh
 - phụ tinh: tách “Sao tốt” và “Sao xấu”
@@ -442,71 +302,91 @@ RÀNG BUỘC AN TOÀN / CHẤT LƯỢNG
 `;
 
 function buildCopyTextWithSystemPrompt(
-  thienBan: TuViData["thienBan"],
+  thienBan: TuViData['thienBan'],
   cungs: CungData[],
 ) {
   const resultText = buildCopyText(thienBan, cungs);
   return `${resultText}\n\n====================\nSYSTEM PROMPT\n====================\n${SYSTEM_PROMPT}`.trim();
 }
 
-async function LasoPageOld1({
-  searchParams,
+export type LasoClientInput = {
+  name: string;
+  day: number;
+  month: number;
+  year: number;
+  solar: boolean;
+  hour: number;
+  gender: string;
+  viewYear: number;
+  viewMonth: number;
+};
+
+export function LasoClient({
+  input,
+  adsenseClientSlotLasoBottom,
 }: {
-  searchParams: SearchParams;
+  input: LasoClientInput;
+  adsenseClientSlotLasoBottom: string;
 }) {
-  const adsenseClientSlotLasoBottom =
-    process.env.NEXT_PUBLIC_ADSENSE_SLOT_LASO_BOTTOM || "";
+  const {
+    name,
+    day,
+    month,
+    year,
+    solar,
+    hour,
+    gender,
+    viewYear,
+    viewMonth,
+  } = input;
 
-  const params = await searchParams;
+  const [data, setData] = useState<TuViData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const name = params.name || "";
-  const day = parseInt(params.day || "1", 10);
-  const month = parseInt(params.month || "1", 10);
-  const year = parseInt(params.year || "2000", 10);
-  const isSolar = params.solar !== "0";
-  const hour = parseInt(params.hour || "1", 10);
-  const gender = params.gender || "M";
-  const viewYear = parseInt(
-    params.viewYear || new Date().getFullYear().toString(),
-    10,
-  );
-  const viewMonth = parseInt(params.viewMonth || "1", 10);
+  useEffect(() => {
+    let cancelled = false;
 
-  // Fetch la-so data from the browser to avoid Netlify server-side 403.
-  return (
-    <LasoClient
-      input={{
-        name,
-        day,
-        month,
-        year,
-        solar: isSolar,
-        hour,
-        gender,
-        viewYear,
-        viewMonth,
-      }}
-      adsenseClientSlotLasoBottom={adsenseClientSlotLasoBottom}
-    />
-  );
+    async function run() {
+      setLoading(true);
+      setError(null);
+      setData(null);
+      try {
+        const d = await fetchTuViData({
+          name,
+          day,
+          month,
+          year,
+          hour,
+          gender,
+          viewYear,
+          viewMonth,
+          solar,
+        });
+        if (!cancelled) setData(d);
+      } catch (e) {
+        if (cancelled) return;
+        const msg = e instanceof Error ? e.message : 'Có lỗi xảy ra';
+        setError(msg);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
 
-  let data: TuViData | null = null;
-  let error: string | null = null;
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [name, day, month, year, solar, hour, gender, viewYear, viewMonth]);
 
-  try {
-    data = await fetchTuViData({
-      name,
-      day,
-      month,
-      year,
-      hour,
-      gender,
-      viewYear,
-      viewMonth,
-      solar: isSolar,
-    });
-  } catch (err) {
-    error = err instanceof Error ? (err as Error).message : "Có lỗi xảy ra";
+  if (loading) {
+    return (
+      <section className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8">
+        <h1 className="mb-4 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+          Đang lập lá số...
+        </h1>
+      </section>
+    );
   }
 
   if (error || !data) {
@@ -516,7 +396,7 @@ async function LasoPageOld1({
           Không thể lập lá số
         </h1>
         <p className="mb-6 text-zinc-600 dark:text-zinc-400">
-          {error || "Không nhận được dữ liệu từ server."}
+          {error || 'Không nhận được dữ liệu từ server.'}
         </p>
         <Link
           href="/"
@@ -528,8 +408,8 @@ async function LasoPageOld1({
     );
   }
 
-  const { thienBan, cungs } = data!;
-  const displayName = thienBan.hoTen || name || "Chưa nhập tên";
+  const { thienBan, cungs } = data;
+  const displayName = thienBan.hoTen || name || 'Chưa nhập tên';
   const copyText = buildCopyText(thienBan, cungs);
   const copyTextWithPrompt = buildCopyTextWithSystemPrompt(thienBan, cungs);
 
@@ -537,7 +417,7 @@ async function LasoPageOld1({
     <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
-          Lá Số Tử Vi —{" "}
+          Lá Số Tử Vi —{' '}
           <span className="text-amber-600 dark:text-amber-400">
             {displayName}
           </span>
@@ -552,6 +432,7 @@ async function LasoPageOld1({
           label="Copy lá số + System prompt"
         />
       </div>
+
       <div className="mb-10 rounded-xl border border-amber-200/60 bg-amber-50/50 p-6 shadow-sm dark:border-amber-900/40 dark:bg-zinc-900">
         <h2 className="mb-5 text-lg font-bold text-amber-800 dark:text-amber-400">
           Thông Tin Tổng Quan
@@ -561,7 +442,9 @@ async function LasoPageOld1({
           <InfoRow label="Năm sinh" value={`${thienBan.namSinh}`} />
           <InfoRow
             label="Ngày sinh"
-            value={`${thienBan.solarDate} (Dương lịch) — ${thienBan.lunarDate} (Âm lịch)`}
+            value={`${thienBan.solarDate} (Dương lịch) — ${
+              thienBan.lunarDate
+            } (Âm lịch)`}
           />
           <InfoRow label="Giờ sinh" value={thienBan.gioSinh} />
           <InfoRow label="Âm dương" value={thienBan.amDuong} />
@@ -603,10 +486,7 @@ async function LasoPageOld1({
 
       {/* la-so-bottom: cuối trang trước phần System prompt */}
       <div className="mt-6">
-        <AdsenseAd
-          slotId={adsenseClientSlotLasoBottom}
-          minHeight={260}
-        />
+        <AdsenseAd slotId={adsenseClientSlotLasoBottom} minHeight={260} />
         <div className="mt-4">
           <ShopeeAd placement="la-so-bottom" minHeight={120} />
         </div>
@@ -628,3 +508,4 @@ async function LasoPageOld1({
     </section>
   );
 }
+

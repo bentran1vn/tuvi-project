@@ -186,17 +186,23 @@ const CUNG_ORDER = [
 ];
 
 function buildApiHeaders() {
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.URL ||
-    "";
-  return {
+  const isBrowser = typeof window !== "undefined";
+
+  // In browsers, many headers (User-Agent, Origin, Referer) are forbidden.
+  const base = {
     "Content-Type": "application/json",
     Accept: "application/json,text/plain,*/*",
     "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+    "X-Requested-With": "XMLHttpRequest",
+  } as const;
+
+  if (isBrowser) return base;
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.URL || "";
+  return {
+    ...base,
     "User-Agent": "Mozilla/5.0 (compatible; TuviProject/1.0)",
     ...(siteUrl ? { Origin: siteUrl, Referer: siteUrl } : {}),
-    "X-Requested-With": "XMLHttpRequest",
   } as const;
 }
 
