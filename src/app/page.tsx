@@ -1,65 +1,128 @@
-import Image from "next/image";
+import { siteConfig } from "@/lib/site-config";
+import { JsonLd, breadcrumbJsonLd } from "@/lib/structured-data";
+import { TuViForm } from "@/components/tu-vi-form";
+import { AdsenseAd } from "@/components/adsense-ad";
+import { ShopeeAd } from "@/components/shopee-ad";
+
+const features = [
+  {
+    icon: "✦",
+    title: "Lá Số Tử Vi",
+    description:
+      "Phân tích chi tiết lá số tử vi dựa trên ngày giờ sinh, giúp bạn hiểu rõ vận mệnh và con đường phía trước.",
+  },
+  {
+    icon: "☰",
+    title: "Tử Vi Hàng Ngày",
+    description:
+      "Cập nhật dự báo tử vi hàng ngày, hàng tuần và hàng tháng giúp bạn chủ động lên kế hoạch.",
+  },
+  {
+    icon: "◎",
+    title: "12 Cung Hoàng Đạo",
+    description:
+      "Tìm hiểu đặc điểm tính cách, tương hợp và dự đoán cho từng cung hoàng đạo.",
+  },
+  {
+    icon: "⬡",
+    title: "Phong Thủy",
+    description:
+      "Lời khuyên phong thủy kết hợp với lá số tử vi để mang lại may mắn và thịnh vượng.",
+  },
+];
 
 export default function Home() {
+  const adsenseClientSlotHomeTop =
+    process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_TOP || "";
+  const adsenseClientSlotSidebar =
+    process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR || "";
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <JsonLd
+        data={breadcrumbJsonLd([{ name: "Trang chủ", url: siteConfig.url }])}
+      />
+
+      {/* Hero + Lập Lá Số Form */}
+      <section className="relative overflow-hidden bg-linear-to-b from-amber-50/50 to-white dark:from-zinc-950 dark:to-zinc-900">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-amber-100/40 via-transparent to-transparent dark:from-amber-900/10" />
+        <div className="relative mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-8">
+            <div className="lg:col-span-8">
+              <div className="text-center mb-10">
+                <h1 className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl lg:text-6xl dark:text-zinc-50">
+                  Khám Phá Vận Mệnh
+                  <span className="block bg-linear-to-r from-amber-600 to-red-600 bg-clip-text text-transparent dark:from-amber-400 dark:to-red-400">
+                    Qua Tử Vi Việt Nam
+                  </span>
+                </h1>
+                <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
+                  {siteConfig.description}
+                </p>
+              </div>
+
+              <TuViForm />
+
+              {/* home-top: ngay dưới form */}
+              <div className="mt-6">
+                <AdsenseAd slotId={adsenseClientSlotHomeTop} minHeight={240} />
+                <div className="mt-4">
+                  <ShopeeAd placement="home-top" minHeight={120} />
+                </div>
+              </div>
+            </div>
+
+            {/* sidebar: cột phải trên desktop */}
+            <aside className="hidden lg:block lg:col-span-4">
+              <div className="sticky top-24">
+                <AdsenseAd slotId={adsenseClientSlotSidebar} minHeight={300} />
+                <div className="mt-4">
+                  <ShopeeAd placement="sidebar" minHeight={120} />
+                </div>
+              </div>
+            </aside>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Features */}
+      <section
+        className="bg-white py-20 dark:bg-zinc-900"
+        aria-labelledby="features-heading"
+      >
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2
+              id="features-heading"
+              className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50"
+            >
+              Dịch Vụ Của Chúng Tôi
+            </h2>
+            <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
+              Công cụ tử vi toàn diện giúp bạn hiểu rõ bản thân và vận mệnh.
+            </p>
+          </div>
+          <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2">
+            {features.map((feature) => (
+              <article
+                key={feature.title}
+                className="group relative rounded-2xl border border-zinc-200 p-8 transition-all hover:border-zinc-300 hover:shadow-lg dark:border-zinc-800 dark:hover:border-zinc-700"
+              >
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-2xl dark:bg-indigo-950">
+                  {feature.icon}
+                </div>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                  {feature.title}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                  {feature.description}
+                </p>
+              </article>
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+    </>
   );
 }
